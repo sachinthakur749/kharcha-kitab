@@ -1,22 +1,8 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, FontSize, FontWeight, Spacing } from '../../constants/theme';
-
-const TabIcon: React.FC<{ name: string; focused: boolean }> = ({ name, focused }) => {
-  const icons: Record<string, string> = {
-    home: '🏠',
-    history: '📋',
-    stats: '📊',
-    settings: '⚙️',
-  };
-
-  return (
-    <View style={styles.iconContainer}>
-      <Text style={[styles.icon, focused && styles.iconFocused]}>{icons[name]}</Text>
-    </View>
-  );
-};
 
 export default function TabLayout() {
   return (
@@ -33,28 +19,52 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ focused }) => <TabIcon name="home" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'home' : 'home-outline'}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="history"
         options={{
           title: 'History',
-          tabBarIcon: ({ focused }) => <TabIcon name="history" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'time' : 'time-outline'}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: 'Stats',
-          tabBarIcon: ({ focused }) => <TabIcon name="stats" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'stats-chart' : 'stats-chart-outline'}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ focused }) => <TabIcon name="settings" focused={focused} />,
+          tabBarIcon: ({ focused, color }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              size={24}
+              color={color}
+            />
+          ),
         }}
       />
     </Tabs>
@@ -73,16 +83,5 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.medium,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  icon: {
-    fontSize: 20,
-    opacity: 0.6,
-  },
-  iconFocused: {
-    opacity: 1,
   },
 });
