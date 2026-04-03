@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Linking, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { useTransactionStore } from '../store/transactionStore';
-import { Button } from '../components/Button';
-import { Card } from '../components/Card';
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button } from "../components/Button";
+import { useTransactionStore } from "../store/transactionStore";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -13,29 +18,30 @@ export default function OnboardingScreen() {
 
   const steps = [
     {
-      title: 'Welcome to Kharcha Kitab',
-      description: 'Your automatic expense tracker for Nepali banks and digital wallets.',
-      icon: '💰',
+      title: "Welcome to Kharcha Kitab",
+      description:
+        "Your automatic expense tracker for Nepali banks and digital wallets.",
+      icon: "💰",
     },
     {
-      title: 'SMS Permission',
+      title: "SMS Permission",
       description:
-        'We need permission to read SMS from your bank to automatically log transactions. This helps track your expenses without manual entry.',
-      icon: '📱',
-      action: 'Open SMS Settings',
+        "We need permission to read SMS from your bank to automatically log transactions. This helps track your expenses without manual entry.",
+      icon: "📱",
+      action: "Open SMS Settings",
     },
     {
-      title: 'Notification Access',
+      title: "Notification Access",
       description:
-        'Enable notification access to read push notifications from digital wallets like eSewa, Khalti, and IME Pay.',
-      icon: '🔔',
-      action: 'Open Settings',
+        "Enable notification access to read push notifications from digital wallets like eSewa, Khalti, and IME Pay.",
+      icon: "🔔",
+      action: "Open Settings",
     },
     {
-      title: 'All Set!',
+      title: "All Set!",
       description:
-        'Kharcha Kitab is ready to automatically track your income and expenses from SMS and notifications.',
-      icon: '✅',
+        "Kharcha Kitab is ready to automatically track your income and expenses from SMS and notifications.",
+      icon: "✅",
     },
   ];
 
@@ -44,7 +50,7 @@ export default function OnboardingScreen() {
       setCurrentStep(currentStep + 1);
     } else {
       setOnboardingComplete(true);
-      router.replace('/home');
+      router.replace("/home");
     }
   };
 
@@ -82,7 +88,7 @@ export default function OnboardingScreen() {
 
       <View style={styles.footer}>
         <Button
-          title={currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
+          title={currentStep === steps.length - 1 ? "Get Started" : "Next"}
           onPress={handleNext}
         />
       </View>
@@ -93,12 +99,12 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
   },
   content: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 24,
   },
   icon: {
@@ -107,15 +113,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#1F2937',
-    textAlign: 'center',
+    fontWeight: "700",
+    color: "#1F2937",
+    textAlign: "center",
     marginBottom: 16,
   },
   description: {
     fontSize: 16,
-    color: '#6B7280',
-    textAlign: 'center',
+    color: "#6B7280",
+    textAlign: "center",
     lineHeight: 24,
     marginBottom: 24,
   },
@@ -123,18 +129,18 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   dots: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 32,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#D1D5DB',
+    backgroundColor: "#D1D5DB",
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#208AEF',
+    backgroundColor: "#208AEF",
     width: 24,
   },
   footer: {
