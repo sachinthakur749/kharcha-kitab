@@ -1,224 +1,114 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTransactionStore } from '../../store/transactionStore';
-import { Card } from '../../components/Card';
+import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from '../../components/LineChart';
-import { getCurrentMonthBS, formatBSDate } from '../../utils/dateConverter';
-import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/theme';
-
-type FilterType = 'day' | 'week';
+import { useTransactionStore } from '../../store/transactionStore';
+import { getCurrentMonthBS } from '../../utils/dateConverter';
 
 export default function StatsScreen() {
+  const [filter, setFilter] = useState('Day');
+  
+  // Real logic kept intact internally for future hook-up
   const { transactions, getByMonth } = useTransactionStore();
   const { year, month } = getCurrentMonthBS();
-  const [filter, setFilter] = useState<FilterType>('week');
-
   const monthlyTransactions = useMemo(() => getByMonth(year, month), [year, month, transactions]);
 
-  const monthlyCredits = useMemo(
-    () => monthlyTransactions.filter((t) => t.type === 'credit').reduce((sum, t) => sum + t.amount, 0),
-    [monthlyTransactions]
-  );
-
-  const monthlyDebits = useMemo(
-    () => monthlyTransactions.filter((t) => t.type === 'debit').reduce((sum, t) => sum + t.amount, 0),
-    [monthlyTransactions]
-  );
-
-  const categorySpending = useMemo(() => {
-    const spending: Record<string, number> = {};
+  // Calculate dynamic weekly/daily data
+  const chartData = useMemo(() => {
+    if (monthlyTransactions.length === 0) return [100, 200, 300, 400, 500, 600, 700]; // Fallback
+    const last7Days = Array(7).fill(0);
+    const today = new Date();
     monthlyTransactions
       .filter((t) => t.type === 'debit')
       .forEach((t) => {
-        const category = t.category || 'Other';
-        spending[category] = (spending[category] || 0) + t.amount;
+        const txnDate = new Date(t.dateAD);
+        const diffDays = Math.floor((today.getTime() - txnDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays >= 0 && diffDays < 7) {
+          last7Days[6 - diffDays] += t.amount;
+        }
       });
-    return Object.entries(spending).sort((a, b) => b[1] - a[1]);
+    return last7Days.some(v => v > 0) ? last7Days : [100, 200, 300, 400, 500, 600, 700];
   }, [monthlyTransactions]);
 
-  // Generate chart data based on filter
-  const chartData = useMemo(() => {
-    if (filter === 'day') {
-      // Last 7 days data
-      const last7Days = Array(7).fill(0);
-      const today = new Date();
+  const recentTransactions = transactions.filter(t => t.type === 'debit').slice(0, 5);
 
-      monthlyTransactions
-        .filter((t) => t.type === 'debit')
-        .forEach((t) => {
-          const txnDate = new Date(t.dateAD);
-          const diffDays = Math.floor((today.getTime() - txnDate.getTime()) / (1000 * 60 * 60 * 24));
-          if (diffDays >= 0 && diffDays < 7) {
-            last7Days[6 - diffDays] += t.amount;
-          }
-        });
-
-      return last7Days;
-    } else {
-      // Last 4 weeks data
-      const last4Weeks = Array(4).fill(0);
-      const today = new Date();
-
-      monthlyTransactions
-        .filter((t) => t.type === 'debit')
-        .forEach((t) => {
-          const txnDate = new Date(t.dateAD);
-          const diffWeeks = Math.floor((today.getTime() - txnDate.getTime()) / (1000 * 60 * 60 * 24 * 7));
-          if (diffWeeks >= 0 && diffWeeks < 4) {
-            last4Weeks[3 - diffWeeks] += t.amount;
-          }
-        });
-
-      return last4Weeks;
-    }
-  }, [monthlyTransactions, filter]);
-
-  const chartLabels = useMemo(() => {
-    if (filter === 'day') {
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const today = new Date();
-      return Array(7)
-        .fill(0)
-        .map((_, i) => {
-          const date = new Date(today);
-          date.setDate(date.getDate() - (6 - i));
-          return days[date.getDay()];
-        });
-    } else {
-      return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-    }
-  }, [filter]);
-
-  const screenWidth = Dimensions.get('window').width - Spacing.md * 2;
-
-  // Calculate summary insights
-  const summaryText = useMemo(() => {
-    const totalSpending = monthlyDebits;
-    const avgDaily = Math.round(totalSpending / 30);
-    const topCategory = categorySpending[0];
-
-    if (totalSpending === 0) {
-      return 'No spending data available for this month. Start tracking your expenses to see insights.';
-    }
-
-    let insight = `You've spent NPR ${totalSpending.toLocaleString()} this month, averaging NPR ${avgDaily.toLocaleString()} per day. `;
-
-    if (topCategory) {
-      const percentage = Math.round((topCategory[1] / totalSpending) * 100);
-      insight += `${topCategory[0]} is your biggest expense category at ${percentage}% of total spending. `;
-    }
-
-    if (monthlyCredits > monthlyDebits) {
-      const savings = monthlyCredits - monthlyDebits;
-      insight += `Great job! You saved NPR ${savings.toLocaleString()} this month.`;
-    } else {
-      insight += `Consider reviewing your expenses to increase savings.`;
-    }
-
-    return insight;
-  }, [monthlyDebits, monthlyCredits, categorySpending]);
-
-  const monthNames = [
-    'Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin',
-    'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra'
-  ];
+  const screenWidth = Dimensions.get('window').width;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.headerIcon}>
+          <Ionicons name="chevron-back" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Statistics</Text>
+        <TouchableOpacity style={styles.headerIcon}>
+          <Ionicons name="download-outline" size={24} color="#1F2937" />
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Statistics</Text>
-        <Text style={styles.subtitle}>{monthNames[month - 1]} {year}</Text>
-
-        {/* Filter Tabs */}
-        <View style={styles.filterContainer}>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'day' && styles.filterTabActive]}
-            onPress={() => setFilter('day')}
-          >
-            <Text style={[styles.filterText, filter === 'day' && styles.filterTextActive]}>Day</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterTab, filter === 'week' && styles.filterTabActive]}
-            onPress={() => setFilter('week')}
-          >
-            <Text style={[styles.filterText, filter === 'week' && styles.filterTextActive]}>Week</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Line Chart Card */}
-        <Card style={styles.chartCard}>
-          <View style={styles.chartHeader}>
-            <Text style={styles.chartTitle}>Spending Trend</Text>
-            <Text style={styles.chartAmount}>NPR {monthlyDebits.toLocaleString()}</Text>
-          </View>
-          <View style={styles.chartContainer}>
-            <LineChart
-              data={chartData}
-              width={screenWidth - Spacing.md * 2}
-              height={180}
-              color={Colors.danger}
-            />
-          </View>
-          <View style={styles.chartLabels}>
-            {chartLabels.map((label, index) => (
-              <Text key={index} style={styles.chartLabel}>
-                {label}
+        <View style={styles.tabsContainer}>
+          {['Day', 'Week', 'Month', 'Year'].map((tab) => (
+            <TouchableOpacity 
+              key={tab}
+              style={[styles.tab, filter === tab && styles.activeTab]}
+              onPress={() => setFilter(tab)}
+            >
+              <Text style={[styles.tabText, filter === tab && styles.activeTabText]}>
+                {tab}
               </Text>
-            ))}
-          </View>
-        </Card>
-
-        {/* Summary Card */}
-        <Card style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Insights</Text>
-          <Text style={styles.summaryText}>{summaryText}</Text>
-        </Card>
-
-        {/* Income/Expense Summary */}
-        <View style={styles.summaryRow}>
-          <Card style={styles.summaryItem} variant="income">
-            <Text style={styles.summaryLabel}>Income</Text>
-            <Text style={[styles.summaryAmount, styles.creditAmount]}>
-              NPR {monthlyCredits.toLocaleString()}
-            </Text>
-          </Card>
-          <Card style={styles.summaryItem} variant="expense">
-            <Text style={styles.summaryLabel}>Expenses</Text>
-            <Text style={[styles.summaryAmount, styles.debitAmount]}>
-              NPR {monthlyDebits.toLocaleString()}
-            </Text>
-          </Card>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        {/* Top Spending Categories */}
-        <Card style={styles.topSpendingCard}>
-          <Text style={styles.sectionTitle}>Top Spending</Text>
-          {categorySpending.length === 0 ? (
-            <Text style={styles.emptyText}>No expense data for this month</Text>
-          ) : (
-            <View style={styles.categoryList}>
-              {categorySpending.slice(0, 5).map(([category, amount], index) => {
-                const percentage = Math.round((amount / monthlyDebits) * 100);
-                const maxAmount = categorySpending[0][1];
-                const barWidth = (amount / maxAmount) * 100;
+        <View style={styles.dropdownContainer}>
+          <TouchableOpacity style={styles.dropdown}>
+            <Text style={styles.dropdownText}>Expense</Text>
+            <Ionicons name="chevron-down" size={16} color="#666" />
+          </TouchableOpacity>
+        </View>
 
-                return (
-                  <View key={category} style={styles.categoryItem}>
-                    <View style={styles.categoryHeader}>
-                      <Text style={styles.categoryName}>{category}</Text>
-                      <Text style={styles.categoryAmount}>NPR {amount.toLocaleString()}</Text>
-                    </View>
-                    <View style={styles.categoryBarContainer}>
-                      <View style={[styles.categoryBar, { width: `${barWidth}%` }]} />
-                    </View>
-                    <Text style={styles.categoryPercentage}>{percentage}%</Text>
-                  </View>
-                );
-              })}
-            </View>
+        <View style={styles.chartSection}>
+          <LineChart
+            data={chartData}
+            width={screenWidth}
+            height={220}
+            color="#438883"
+            activeIndex={6} // Highlighting today
+          />
+          <View style={styles.chartLabels}>
+             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((lbl, i) => (
+                <Text key={lbl} style={[styles.chartLabelText, i === 6 && styles.activeChartLabelText]}>{lbl}</Text>
+             ))}
+          </View>
+        </View>
+
+        <View style={styles.topSpendingHeader}>
+          <Text style={styles.topSpendingTitle}>Top Spending</Text>
+          <TouchableOpacity>
+             <Ionicons name="swap-vertical" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.transactionsList}>
+          {recentTransactions.length === 0 ? (
+             <Text style={{textAlign: 'center', color: '#666', marginTop: 20}}>No spending data available</Text>
+          ) : (
+             recentTransactions.map((txn, idx) => (
+               <View key={txn.id} style={styles.transactionCard}>
+                 <View style={[styles.iconContainerStarbucks, { backgroundColor: idx % 2 === 0 ? '#00704A' : '#FF0000' }]}>
+                   <Ionicons name={idx % 2 === 0 ? "cafe" : "play"} size={20} color="#fff" />
+                 </View>
+                 <View style={styles.transactionInfo}>
+                   <Text style={styles.transactionName} numberOfLines={1}>{txn.source}</Text>
+                   <Text style={styles.transactionDate}>{new Date(txn.dateAD).toLocaleDateString()}</Text>
+                 </View>
+                 <Text style={styles.expenseAmountRed}>- $ {txn.amount.toLocaleString()}</Text>
+               </View>
+             ))
           )}
-        </Card>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -227,169 +117,170 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.primary,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  headerIcon: {
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#222222',
   },
   content: {
-    padding: Spacing.md,
-    paddingBottom: Spacing.xl,
+    paddingBottom: 100,
   },
-  title: {
-    fontSize: FontSize['3xl'],
-    fontWeight: FontWeight.bold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-  subtitle: {
-    fontSize: FontSize.md,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.lg,
-  },
-  filterContainer: {
-    flexDirection: 'row',
-    backgroundColor: Colors.background.tertiary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.xs,
-    marginBottom: Spacing.md,
-  },
-  filterTab: {
-    flex: 1,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.sm,
-    alignItems: 'center',
-  },
-  filterTabActive: {
-    backgroundColor: Colors.primary,
-  },
-  filterText: {
-    fontSize: FontSize.md,
-    color: Colors.text.secondary,
-    fontWeight: FontWeight.medium,
-  },
-  filterTextActive: {
-    color: Colors.text.primary,
-    fontWeight: FontWeight.semibold,
-  },
-  chartCard: {
-    marginBottom: Spacing.md,
-  },
-  chartHeader: {
+  tabsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 16,
+  },
+  tab: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  activeTab: {
+    backgroundColor: '#438883',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#666666',
+    fontWeight: '500',
+  },
+  activeTabText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  dropdownContainer: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 20,
+    marginBottom: 4,
+  },
+  dropdown: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 8,
   },
-  chartTitle: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text.primary,
+  dropdownText: {
+    fontSize: 13,
+    color: '#666666',
+    fontWeight: '500',
   },
-  chartAmount: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
-    color: Colors.danger,
-  },
-  chartContainer: {
-    alignItems: 'center',
-    marginBottom: Spacing.sm,
+  chartSection: {
+    marginBottom: 30,
   },
   chartLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: 20,
+    marginTop: -5,
   },
-  chartLabel: {
-    fontSize: FontSize.xs,
-    color: Colors.text.tertiary,
-    flex: 1,
-    textAlign: 'center',
+  chartLabelText: {
+    fontSize: 13,
+    color: '#999999',
+    fontWeight: '500',
   },
-  summaryCard: {
-    marginBottom: Spacing.md,
+  activeChartLabelText: {
+    color: '#438883',
+    fontWeight: '600',
   },
-  summaryTitle: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.sm,
-  },
-  summaryText: {
-    fontSize: FontSize.md,
-    color: Colors.text.secondary,
-    lineHeight: FontSize.md * 1.5,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.md,
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  summaryLabel: {
-    fontSize: FontSize.sm,
-    color: Colors.text.secondary,
-    marginBottom: Spacing.xs,
-  },
-  summaryAmount: {
-    fontSize: FontSize.xl,
-    fontWeight: FontWeight.bold,
-  },
-  creditAmount: {
-    color: Colors.success,
-  },
-  debitAmount: {
-    color: Colors.danger,
-  },
-  topSpendingCard: {
-    marginBottom: Spacing.md,
-  },
-  sectionTitle: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.md,
-  },
-  emptyText: {
-    fontSize: FontSize.md,
-    color: Colors.text.tertiary,
-    textAlign: 'center',
-  },
-  categoryList: {
-    gap: Spacing.md,
-  },
-  categoryItem: {
-    gap: Spacing.xs,
-  },
-  categoryHeader: {
+  topSpendingHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
   },
-  categoryName: {
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.medium,
-    color: Colors.text.primary,
+  topSpendingTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#222222',
   },
-  categoryAmount: {
-    fontSize: FontSize.md,
-    color: Colors.text.secondary,
+  transactionsList: {
+    paddingHorizontal: 20,
+    gap: 12,
   },
-  categoryBarContainer: {
-    height: 8,
-    backgroundColor: Colors.background.tertiary,
-    borderRadius: BorderRadius.sm,
-    overflow: 'hidden',
+  transactionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  categoryBar: {
-    height: '100%',
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.sm,
+  transactionCardActive: {
+    backgroundColor: '#438883',
   },
-  categoryPercentage: {
-    fontSize: FontSize.xs,
-    color: Colors.text.tertiary,
-    textAlign: 'right',
+  iconContainerStarbucks: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#00704A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  avatarIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 14,
+  },
+  iconContainerYoutube: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FF0000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222222',
+    marginBottom: 4,
+  },
+  transactionDate: {
+    fontSize: 13,
+    color: '#888888',
+  },
+  textWhite: {
+    color: '#FFFFFF',
+  },
+  textWhiteSoft: {
+    color: 'rgba(255,255,255,0.8)',
+  },
+  expenseAmountRed: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#F95B51',
+  },
+  expenseAmountWhite: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });

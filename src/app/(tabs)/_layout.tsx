@@ -1,87 +1,98 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, FontSize, FontWeight, Spacing } from '../../constants/theme';
+import { Colors } from '../../constants/theme';
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.text.tertiary,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-        headerShown: false,
-      }}
-    >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={24}
-              color={color}
-            />
-          ),
+    <View style={{ flex: 1, backgroundColor: Colors.background.primary }}>
+      <Tabs
+        screenOptions={{
+          tabBarActiveTintColor: Colors.primary,
+          tabBarInactiveTintColor: Colors.text.tertiary,
+          tabBarStyle: styles.tabBar,
+          tabBarShowLabel: false,
+          headerShown: false,
         }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: 'History',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'time' : 'time-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="stats"
-        options={{
-          title: 'Stats',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'stats-chart' : 'stats-chart-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ focused, color }) => (
-            <Ionicons
-              name={focused ? 'settings' : 'settings-outline'}
-              size={24}
-              color={color}
-            />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons name={focused ? 'home' : 'home-outline'} size={26} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="stats"
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons name={focused ? 'podium' : 'podium-outline'} size={26} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="history" // Designed as Wallet
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <View style={styles.rightTabPadding}>
+                 <Ionicons name={focused ? 'wallet' : 'wallet-outline'} size={26} color={color} />
+              </View>
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings" // Designed as Profile
+          options={{
+            tabBarIcon: ({ focused, color }) => (
+              <Ionicons name={focused ? 'person' : 'person-outline'} size={26} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+      
+      {/* Floating Action Button */}
+      <View style={styles.fabContainer}>
+        <TouchableOpacity style={styles.fab}>
+          <Ionicons name="add" size={32} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: Colors.background.primary,
     borderTopWidth: 1,
     borderTopColor: Colors.border.primary,
-    paddingTop: Spacing.sm,
-    paddingBottom: Spacing.sm,
-    height: 64,
+    height: 70,
+    elevation: 0,
+    shadowOpacity: 0,
   },
-  tabBarLabel: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.medium,
+  rightTabPadding: {
+    // A small bump to push the icon slightly away from the center fab if needed, but flex evenly spaces them by default.
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 35,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  fab: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Transaction } from '../types/transaction';
 import { formatBSDate } from '../utils/dateConverter';
 import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '../constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 
 interface TransactionItemProps {
   transaction: Transaction;
@@ -11,6 +12,13 @@ interface TransactionItemProps {
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onPress }) => {
   const isCredit = transaction.type === 'credit';
+  
+  // Decide icon based on simple heuristics or just default
+  const source = transaction.source?.toLowerCase() || '';
+  let iconName = 'wallet';
+  if (source.includes('food') || source.includes('coffee') || source.includes('starbucks')) iconName = 'cafe';
+  if (source.includes('transfer')) iconName = 'swap-horizontal';
+  if (source.includes('youtube') || source.includes('netflix')) iconName = 'play';
 
   return (
     <TouchableOpacity
@@ -20,27 +28,17 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
     >
       <View style={styles.left}>
         <View style={[styles.icon, isCredit ? styles.creditIcon : styles.debitIcon]}>
-          <Text style={[styles.iconText, { color: isCredit ? Colors.success : Colors.danger }]}>
-            {isCredit ? '+' : '-'}
-          </Text>
+           <Ionicons name={iconName as any} size={20} color="#FFFFFF" />
         </View>
         <View style={styles.details}>
           <Text style={styles.source} numberOfLines={1}>{transaction.source}</Text>
-          {transaction.note && (
-            <Text style={styles.note} numberOfLines={1}>{transaction.note}</Text>
-          )}
           <Text style={styles.date}>{formatBSDate(transaction.dateBS)}</Text>
         </View>
       </View>
       <View style={styles.right}>
         <Text style={[styles.amount, isCredit ? styles.creditAmount : styles.debitAmount]}>
-          {isCredit ? '+' : '-'} NPR {transaction.amount.toLocaleString()}
+          {isCredit ? '+' : '-'} $ {transaction.amount.toLocaleString()}
         </Text>
-        {transaction.isAuto && (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>AUTO</Text>
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -51,13 +49,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: Colors.background.elevated,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border.primary,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   left: {
     flexDirection: 'row',
@@ -67,62 +68,41 @@ const styles = StyleSheet.create({
   icon: {
     width: 44,
     height: 44,
-    borderRadius: BorderRadius.full,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: Spacing.md,
+    marginRight: 14,
   },
   creditIcon: {
-    backgroundColor: Colors.card.income,
+    backgroundColor: '#22C55E',
   },
   debitIcon: {
-    backgroundColor: Colors.card.expense,
-  },
-  iconText: {
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
+    backgroundColor: '#F95B51',
   },
   details: {
     flex: 1,
   },
   source: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text.primary,
-  },
-  note: {
-    fontSize: FontSize.sm,
-    color: Colors.text.secondary,
-    marginTop: 2,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#222222',
+    marginBottom: 4,
   },
   date: {
-    fontSize: FontSize.xs,
-    color: Colors.text.tertiary,
-    marginTop: 2,
+    fontSize: 13,
+    color: '#888888',
   },
   right: {
     alignItems: 'flex-end',
   },
   amount: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
+    fontSize: 16,
+    fontWeight: '700',
   },
   creditAmount: {
-    color: Colors.success,
+    color: '#22C55E',
   },
   debitAmount: {
-    color: Colors.danger,
-  },
-  badge: {
-    backgroundColor: Colors.background.tertiary,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
-    borderRadius: BorderRadius.sm,
-    marginTop: Spacing.xs,
-  },
-  badgeText: {
-    fontSize: FontSize.xs,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text.secondary,
+    color: '#F95B51',
   },
 });

@@ -6,40 +6,41 @@
 import { Platform } from 'react-native';
 
 export const Colors = {
-  primary: '#4E5BA6',
-  primaryLight: '#6B75C4',
-  primaryDark: '#3D4887',
+  primary: '#438883', // Exact Teal found in all UI backgrounds
+  primaryLight: '#599E99',
+  primaryDark: '#387B75',
 
   secondary: '#F4F4F5',
-  secondaryDark: '#27272A',
+  secondaryDark: '#E5E7EB',
 
-  success: '#22C55E',
-  successLight: '#1A2E1A',
+  success: '#22C55E', // Green for income
+  successLight: '#DCFCE7',
 
-  danger: '#EF4444',
-  dangerLight: '#2E1A1A',
+  danger: '#F95B51', // Exact Red for expense
+  dangerLight: '#FEE2E2',
 
   text: {
-    primary: '#FFFFFF',
-    secondary: '#A1A1AA',
-    tertiary: '#71717A',
+    primary: '#222222', // Dark slate for headers
+    secondary: '#666666', // Muted text for dates/labels
+    tertiary: '#999999', // Faint text for disabled/inactive
+    inverse: '#FFFFFF', // White text
   },
 
   background: {
-    primary: '#09090B',
-    secondary: '#18181B',
-    tertiary: '#27272A',
-    elevated: '#1F1F23',
+    primary: '#FFFFFF',   // Stark white screens/cards
+    secondary: '#F3F4F6', // Off-white/gray screen backgrounds
+    tertiary: '#EFEFEF',
+    elevated: '#FFFFFF',  // Floating cards
   },
 
   border: {
-    primary: '#27272A',
-    secondary: '#3F3F46',
+    primary: '#EFEFEF',
+    secondary: '#D1D5DB',
   },
 
   card: {
-    income: '#1A2E1A',
-    expense: '#2E1A1A',
+    income: '#FFFFFF',
+    expense: '#FFFFFF',
   },
 } as const;
 
