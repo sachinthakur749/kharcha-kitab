@@ -1,27 +1,33 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
+import { Colors, BorderRadius, Spacing } from '../constants/theme';
 
 interface CardProps {
   children: React.ReactNode;
   style?: ViewStyle;
+  variant?: 'default' | 'income' | 'expense';
 }
 
-export const Card: React.FC<CardProps> = ({ children, style }) => {
-  return <View style={[styles.card, style]}>{children}</View>;
+export const Card: React.FC<CardProps> = ({ children, style, variant = 'default' }) => {
+  const getBackgroundColor = () => {
+    switch (variant) {
+      case 'income':
+        return Colors.card.income;
+      case 'expense':
+        return Colors.card.expense;
+      default:
+        return Colors.background.elevated;
+    }
+  };
+
+  return <View style={[styles.card, { backgroundColor: getBackgroundColor() }, style]}>{children}</View>;
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border.primary,
   },
 });

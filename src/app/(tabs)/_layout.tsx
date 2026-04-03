@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors, FontSize, FontWeight, Spacing } from '../../constants/theme';
 
 const TabIcon: React.FC<{ name: string; focused: boolean }> = ({ name, focused }) => {
   const icons: Record<string, string> = {
@@ -21,8 +22,8 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#208AEF',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.text.tertiary,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabBarLabel,
         headerShown: false,
@@ -62,16 +63,16 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background.secondary,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingTop: 8,
-    paddingBottom: 8,
-    height: 60,
+    borderTopColor: Colors.border.primary,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm,
+    height: 64,
   },
   tabBarLabel: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.medium,
   },
   iconContainer: {
     alignItems: 'center',

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTransactionStore } from '../../store/transactionStore';
 import { Card } from '../../components/Card';
 import { getCurrentMonthBS } from '../../utils/dateConverter';
+import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/theme';
 
 export default function StatsScreen() {
   const { transactions, getByMonth } = useTransactionStore();
@@ -40,7 +41,7 @@ export default function StatsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Statistics</Text>
 
         <Card style={styles.summaryCard}>
@@ -81,7 +82,7 @@ export default function StatsScreen() {
                     <View
                       style={[
                         styles.bar,
-                        { width: `${(amount / maxCategoryAmount) * 100}%` },
+                        { width: `${(amount / maxCategoryAmount) * 100}%` as const },
                       ]}
                     />
                     <Text style={styles.barValue}>NPR {amount.toLocaleString()}</Text>
@@ -111,25 +112,26 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.background.primary,
   },
   content: {
-    padding: 16,
+    padding: Spacing.md,
+    paddingBottom: Spacing.xl,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: FontSize['3xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.lg,
   },
   summaryCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   monthLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#6B7280',
-    marginBottom: 12,
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.md,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -141,96 +143,96 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: 1,
-    height: 40,
-    backgroundColor: '#E5E7EB',
+    height: 48,
+    backgroundColor: Colors.border.primary,
   },
   summaryLabel: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 4,
+    fontSize: FontSize.sm,
+    color: Colors.text.tertiary,
+    marginBottom: Spacing.xs,
   },
   summaryAmount: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.bold,
   },
   creditAmount: {
-    color: '#22C55E',
+    color: Colors.success,
   },
   debitAmount: {
-    color: '#EF4444',
+    color: Colors.danger,
   },
   netContainer: {
-    marginTop: 16,
-    paddingTop: 16,
+    marginTop: Spacing.md,
+    paddingTop: Spacing.md,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: Colors.border.primary,
     alignItems: 'center',
   },
   netLabel: {
-    fontSize: 13,
-    color: '#6B7280',
+    fontSize: FontSize.sm,
+    color: Colors.text.tertiary,
   },
   netAmount: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginTop: 4,
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.bold,
+    marginTop: Spacing.xs,
   },
   chartCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.md,
   },
   emptyText: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: FontSize.md,
+    color: Colors.text.tertiary,
     textAlign: 'center',
   },
   barsContainer: {
-    gap: 12,
+    gap: Spacing.md,
   },
   barRow: {
-    gap: 8,
+    gap: Spacing.xs,
   },
   barLabel: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 4,
+    fontSize: FontSize.sm,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.xs,
   },
   barWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
   },
   bar: {
-    height: 24,
-    backgroundColor: '#208AEF',
-    borderRadius: 4,
+    height: 28,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.sm,
     minWidth: 4,
   },
   barValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text.primary,
   },
   topCategoryCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   topCategory: {
     alignItems: 'center',
   },
   topCategoryName: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1F2937',
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
   },
   topCategoryAmount: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#EF4444',
-    marginTop: 4,
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
+    color: Colors.danger,
+    marginTop: Spacing.xs,
   },
 });

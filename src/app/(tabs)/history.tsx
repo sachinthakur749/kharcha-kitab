@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTransactionStore } from '../../store/transactionStore';
 import { TransactionItem } from '../../components/TransactionItem';
 import { Transaction } from '../../types/transaction';
+import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/theme';
 
 type FilterType = 'all' | 'credit' | 'debit';
 type FilterPeriod = 'all' | 'today' | 'week' | 'month';
@@ -56,7 +57,7 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Transaction History</Text>
+        <Text style={styles.title}>Transactions</Text>
       </View>
 
       <View style={styles.filters}>
@@ -96,60 +97,61 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.background.primary,
   },
   header: {
-    padding: 16,
+    padding: Spacing.md,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1F2937',
+    fontSize: FontSize['3xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
   },
   filters: {
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    gap: 8,
+    paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.md,
+    gap: Spacing.sm,
   },
   filterGroup: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.sm,
   },
   filterButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#E5E7EB',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    backgroundColor: Colors.background.tertiary,
   },
   filterButtonActive: {
-    backgroundColor: '#208AEF',
+    backgroundColor: Colors.primary,
   },
   filterButtonText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#6B7280',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.medium,
+    color: Colors.text.secondary,
   },
   filterButtonTextActive: {
-    color: '#FFFFFF',
+    color: Colors.text.primary,
   },
   list: {
-    padding: 16,
+    padding: Spacing.md,
+    paddingTop: 0,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: Spacing.xl,
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#6B7280',
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text.secondary,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#9CA3AF',
+    fontSize: FontSize.md,
+    color: Colors.text.tertiary,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
 });

@@ -1,16 +1,11 @@
-import { useColorScheme } from 'react-native';
-
-import { Colors, ThemeColor } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 export function useTheme() {
-  const scheme = useColorScheme();
-  const isDark = scheme === 'dark';
-
   return {
-    background: isDark ? Colors.dark.background : Colors.light.background,
-    backgroundElement: isDark ? Colors.dark.backgroundElement : Colors.light.backgroundElement,
-    backgroundSelected: isDark ? Colors.dark.backgroundSelected : Colors.light.backgroundSelected,
-    text: isDark ? Colors.dark.text : Colors.light.text,
-    textSecondary: isDark ? Colors.dark.textSecondary : Colors.light.textSecondary,
+    background: Colors.background.primary,
+    backgroundElement: Colors.background.elevated,
+    backgroundSelected: Colors.background.tertiary,
+    text: Colors.text.primary,
+    textSecondary: Colors.text.secondary,
   };
 }

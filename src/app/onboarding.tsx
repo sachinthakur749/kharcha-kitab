@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../components/Button";
 import { useTransactionStore } from "../store/transactionStore";
+import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from "../constants/theme";
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -71,7 +72,7 @@ export default function OnboardingScreen() {
           <Button
             title={step.action}
             onPress={handleAction}
-            variant="secondary"
+            variant="outline"
             style={styles.actionButton}
           />
         )}
@@ -99,51 +100,51 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.background.primary,
   },
   content: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
+    padding: Spacing.xl,
   },
   icon: {
     fontSize: 64,
-    marginBottom: 24,
+    marginBottom: Spacing.lg,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#1F2937",
+    fontSize: FontSize['2xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   description: {
-    fontSize: 16,
-    color: "#6B7280",
+    fontSize: FontSize.lg,
+    color: Colors.text.secondary,
     textAlign: "center",
     lineHeight: 24,
-    marginBottom: 24,
+    marginBottom: Spacing.lg,
   },
   actionButton: {
-    marginTop: 16,
+    marginTop: Spacing.md,
   },
   dots: {
     flexDirection: "row",
-    marginTop: 32,
+    marginTop: Spacing.xl,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#D1D5DB",
-    marginHorizontal: 4,
+    backgroundColor: Colors.background.tertiary,
+    marginHorizontal: Spacing.xs,
   },
   activeDot: {
-    backgroundColor: "#208AEF",
+    backgroundColor: Colors.primary,
     width: 24,
   },
   footer: {
-    padding: 24,
+    padding: Spacing.xl,
   },
 });

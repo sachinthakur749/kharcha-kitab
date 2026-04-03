@@ -5,6 +5,7 @@ import { useTransactionStore } from '../../store/transactionStore';
 import { Card } from '../../components/Card';
 import { TransactionItem } from '../../components/TransactionItem';
 import { getTodayBS, formatBSDate, getCurrentMonthBS } from '../../utils/dateConverter';
+import { Colors, FontSize, FontWeight, Spacing, BorderRadius } from '../../constants/theme';
 
 export default function DashboardScreen() {
   const { transactions, getByMonth, getBalance } = useTransactionStore();
@@ -26,11 +27,11 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.header}>Kharcha Kitab</Text>
+        <Text style={styles.date}>{formatBSDate(todayBS)}</Text>
 
         <Card style={styles.balanceCard}>
-          <Text style={styles.todayDate}>{formatBSDate(todayBS)}</Text>
           <Text style={styles.balanceLabel}>Total Balance</Text>
           <Text style={styles.balanceAmount}>
             NPR {getBalance().toLocaleString()}
@@ -38,14 +39,14 @@ export default function DashboardScreen() {
         </Card>
 
         <View style={styles.summaryRow}>
-          <Card style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Income This Month</Text>
+          <Card style={styles.incomeCard} variant="income">
+            <Text style={styles.summaryLabel}>Income</Text>
             <Text style={[styles.summaryAmount, styles.creditAmount]}>
               + NPR {monthlyCredits.toLocaleString()}
             </Text>
           </Card>
-          <Card style={styles.summaryCard}>
-            <Text style={styles.summaryLabel}>Expenses This Month</Text>
+          <Card style={styles.expenseCard} variant="expense">
+            <Text style={styles.summaryLabel}>Expenses</Text>
             <Text style={[styles.summaryAmount, styles.debitAmount]}>
               - NPR {monthlyDebits.toLocaleString()}
             </Text>
@@ -75,78 +76,83 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.background.primary,
   },
   content: {
-    padding: 16,
+    padding: Spacing.md,
+    paddingBottom: Spacing.xl,
   },
   header: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: FontSize['3xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  date: {
+    fontSize: FontSize.md,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.lg,
   },
   balanceCard: {
-    backgroundColor: '#208AEF',
-    marginBottom: 16,
-  },
-  todayDate: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginBottom: 8,
+    backgroundColor: Colors.primary,
+    marginBottom: Spacing.md,
   },
   balanceLabel: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: FontSize.md,
+    color: Colors.text.primary,
+    opacity: 0.8,
+    marginBottom: Spacing.xs,
   },
   balanceAmount: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginTop: 4,
+    fontSize: FontSize['3xl'],
+    fontWeight: FontWeight.bold,
+    color: Colors.text.primary,
   },
   summaryRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
-  summaryCard: {
+  incomeCard: {
+    flex: 1,
+  },
+  expenseCard: {
     flex: 1,
   },
   summaryLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 4,
+    fontSize: FontSize.sm,
+    color: Colors.text.secondary,
+    marginBottom: Spacing.xs,
   },
   summaryAmount: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginTop: 4,
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.bold,
+    marginTop: Spacing.xs,
   },
   creditAmount: {
-    color: '#22C55E',
+    color: Colors.success,
   },
   debitAmount: {
-    color: '#EF4444',
+    color: Colors.danger,
   },
   section: {
-    marginBottom: 24,
+    marginBottom: Spacing.lg,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 12,
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.md,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: FontSize.lg,
+    color: Colors.text.secondary,
     textAlign: 'center',
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#9CA3AF',
+    fontSize: FontSize.md,
+    color: Colors.text.tertiary,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
 });
