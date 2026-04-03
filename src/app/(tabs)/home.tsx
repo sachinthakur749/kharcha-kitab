@@ -42,8 +42,8 @@ export default function DashboardScreen() {
           {/* Header */}
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.greetingText}>Good afternoon,</Text>
-              <Text style={styles.userNameText}>Enjelin Morgeana</Text>
+              <Text style={styles.greetingText}>Welcome back,</Text>
+              <Text style={styles.userNameText}>Kharcha Kitab</Text>
             </View>
             <TouchableOpacity style={styles.bellIconContainer}>
               <Ionicons name="notifications-outline" size={20} color="#FFFFFF" />
@@ -59,7 +59,7 @@ export default function DashboardScreen() {
               </View>
               <Ionicons name="ellipsis-horizontal" size={20} color="#FFFFFF" />
             </View>
-            <Text style={styles.balanceAmount}>$ {getBalance().toLocaleString()}</Text>
+            <Text style={styles.balanceAmount}>NPR {getBalance().toLocaleString()}</Text>
 
             <View style={styles.summaryRow}>
               <View style={styles.summaryBox}>
@@ -69,7 +69,7 @@ export default function DashboardScreen() {
                   </View>
                   <Text style={styles.summarySubLabel}>Income</Text>
                 </View>
-                <Text style={styles.summaryAmount}>$ {monthlyCredits.toLocaleString()}</Text>
+                <Text style={styles.summaryAmount}>NPR {monthlyCredits.toLocaleString()}</Text>
               </View>
 
               <View style={styles.summaryBox}>
@@ -79,7 +79,7 @@ export default function DashboardScreen() {
                   </View>
                   <Text style={styles.summarySubLabel}>Expenses</Text>
                 </View>
-                <Text style={styles.summaryAmount}>$ {monthlyDebits.toLocaleString()}</Text>
+                <Text style={styles.summaryAmount}>NPR {monthlyDebits.toLocaleString()}</Text>
               </View>
             </View>
           </View>
@@ -103,20 +103,6 @@ export default function DashboardScreen() {
               ))
             )}
           </View>
-
-          {/* Send Again */}
-          <View style={[styles.sectionHeader, { marginTop: 10 }]}>
-            <Text style={styles.sectionTitle}>Send Again</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.avatarsScroll}>
-            {avatars.map((uri, idx) => (
-               <Image key={idx} source={{ uri }} style={styles.avatar} />
-            ))}
-          </ScrollView>
 
         </ScrollView>
       </SafeAreaView>

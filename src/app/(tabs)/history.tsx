@@ -4,8 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../../store/transactionStore';
 import { TransactionItem } from '../../components/TransactionItem';
-import { Transaction } from '../../types/transaction';
 import { Colors } from '../../constants/theme';
+import { AddTransactionModal } from '../../components/AddTransactionModal';
 
 type FilterType = 'all' | 'credit' | 'debit';
 type FilterPeriod = 'all' | 'today' | 'week' | 'month';
@@ -14,6 +14,7 @@ export default function HistoryScreen() {
   const { transactions, getBalance } = useTransactionStore();
   const [typeFilter, setTypeFilter] = useState<FilterType>('all');
   const [periodFilter, setPeriodFilter] = useState<FilterPeriod>('all');
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const filteredTransactions = useMemo(() => {
     let filtered = [...transactions];
@@ -54,26 +55,14 @@ export default function HistoryScreen() {
   const renderHeader = () => (
     <View style={styles.cardHeader}>
       <Text style={styles.cardLabel}>Total Balance</Text>
-      <Text style={styles.cardAmount}>$ {getBalance().toLocaleString()}</Text>
+      <Text style={styles.cardAmount}>NPR {getBalance().toLocaleString()}</Text>
 
       <View style={styles.actionRow}>
         <View style={styles.actionItem}>
-          <TouchableOpacity style={styles.actionIcon}>
+          <TouchableOpacity style={styles.actionIcon} onPress={() => setShowAddModal(true)}>
             <Ionicons name="add" size={24} color="#666" />
           </TouchableOpacity>
           <Text style={styles.actionLabel}>Add</Text>
-        </View>
-        <View style={styles.actionItem}>
-          <TouchableOpacity style={styles.actionIcon}>
-            <Ionicons name="scan" size={24} color="#666" />
-          </TouchableOpacity>
-          <Text style={styles.actionLabel}>Pay</Text>
-        </View>
-        <View style={styles.actionItem}>
-          <TouchableOpacity style={styles.actionIcon}>
-            <Ionicons name="send" size={24} color="#666" />
-          </TouchableOpacity>
-          <Text style={styles.actionLabel}>Send</Text>
         </View>
       </View>
 

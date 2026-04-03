@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs } from 'expo-router';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/theme';
+import { AddTransactionModal } from '../../components/AddTransactionModal';
 
 export default function TabLayout() {
+  const [showAddModal, setShowAddModal] = useState(false);
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background.primary }}>
       <Tabs
@@ -54,10 +57,13 @@ export default function TabLayout() {
       
       {/* Floating Action Button */}
       <View style={styles.fabContainer}>
-        <TouchableOpacity style={styles.fab}>
+        <TouchableOpacity style={styles.fab} onPress={() => setShowAddModal(true)} activeOpacity={0.8}>
           <Ionicons name="add" size={32} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
+
+      {/* Global Add Manual Entry Modal */}
+      <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
     </View>
   );
 }

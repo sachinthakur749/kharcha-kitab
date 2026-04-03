@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, TextInput, Modal, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../../store/transactionStore';
@@ -13,16 +13,10 @@ export default function SettingsScreen() {
     toggleWallet,
     clearAllTransactions,
     transactions,
-    addTransaction,
   } = useTransactionStore();
 
-  const [showAddModal, setShowAddModal] = useState(false);
   const [showBanksModal, setShowBanksModal] = useState(false);
   const [showWalletsModal, setShowWalletsModal] = useState(false);
-
-  const [manualAmount, setManualAmount] = useState('');
-  const [manualType, setManualType] = useState<'credit' | 'debit'>('debit');
-  const [manualNote, setManualNote] = useState('');
 
   const walletNames = {
     esewa: 'eSewa',
@@ -46,30 +40,6 @@ export default function SettingsScreen() {
         },
       ]
     );
-  };
-
-  const handleAddManualTransaction = () => {
-    const amount = parseFloat(manualAmount);
-    if (isNaN(amount) || amount <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid amount');
-      return;
-    }
-
-    addTransaction({
-      id: 'manual-' + Date.now(),
-      amount,
-      type: manualType,
-      source: 'Manual Entry',
-      category: 'manual',
-      note: manualNote || 'Manual entry',
-      dateAD: new Date().toISOString(),
-      dateBS: new Date().toISOString().split('T')[0],
-      isAuto: false,
-    });
-
-    setManualAmount('');
-    setManualNote('');
-    setShowAddModal(false);
   };
 
   const renderListItem = (icon: string, bg: string, label: string, onPress: () => void, isLast?: boolean) => (
@@ -105,52 +75,20 @@ export default function SettingsScreen() {
           {/* Avatar Section */}
           <View style={styles.profileSection}>
             <View style={styles.avatarBorder}>
-              <Image source={{ uri: 'https://i.pravatar.cc/150?img=5' }} style={styles.avatar} />
+              <Ionicons name="person" size={80} color="#C4C4C4" style={{marginTop: 10}} />
             </View>
-            <Text style={styles.userName}>Enjelin Morgeana</Text>
-            <Text style={styles.userHandle}>@enjelin_morgeana</Text>
+            <Text style={styles.userName}>Kharcha Kitab User</Text>
+            <Text style={styles.userHandle}>@user</Text>
           </View>
 
           {/* Menu Items */}
           <View style={styles.menuContainer}>
-             {renderListItem('diamond', '#EAF5F4', 'Invite Friends', () => {})}
              {renderListItem('business', '#F3F4F6', 'Bank Integrations', () => setShowBanksModal(true))}
              {renderListItem('wallet', '#F3F4F6', 'Digital Wallets', () => setShowWalletsModal(true))}
-             {renderListItem('add-circle', '#F3F4F6', 'Manual Entry', () => setShowAddModal(true))}
-             {renderListItem('lock-closed', '#F3F4F6', 'Data and privacy', handleClearData, true)}
+             {renderListItem('lock-closed', '#F3F4F6', 'Data and privacy (Reset)', handleClearData, true)}
           </View>
         </ScrollView>
       </SafeAreaView>
-
-      {/* Manual Entry Modal */}
-      <Modal visible={showAddModal} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Add Expense</Text>
-              <TouchableOpacity onPress={() => setShowAddModal(false)}>
-                <Ionicons name="close" size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.typeSelector}>
-              <TouchableOpacity style={[styles.typeButton, manualType === 'debit' && styles.typeButtonActive]} onPress={() => setManualType('debit')}>
-                <Text style={[styles.typeButtonText, manualType === 'debit' && styles.typeButtonTextActive]}>Expense</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.typeButton, manualType === 'credit' && styles.typeButtonActiveCredit]} onPress={() => setManualType('credit')}>
-                <Text style={[styles.typeButtonText, manualType === 'credit' && styles.typeButtonTextActive]}>Income</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput style={styles.input} placeholder="Amount ($)" keyboardType="numeric" value={manualAmount} onChangeText={setManualAmount} />
-            <TextInput style={styles.input} placeholder="Note (optional)" value={manualNote} onChangeText={setManualNote} />
-
-            <TouchableOpacity style={styles.submitBtn} onPress={handleAddManualTransaction}>
-              <Text style={styles.submitText}>Add Transaction</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
 
       {/* Banks Modal */}
       <Modal visible={showBanksModal} transparent animationType="slide">

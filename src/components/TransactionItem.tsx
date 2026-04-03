@@ -13,12 +13,8 @@ interface TransactionItemProps {
 export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onPress }) => {
   const isCredit = transaction.type === 'credit';
   
-  // Decide icon based on simple heuristics or just default
-  const source = transaction.source?.toLowerCase() || '';
-  let iconName = 'wallet';
-  if (source.includes('food') || source.includes('coffee') || source.includes('starbucks')) iconName = 'cafe';
-  if (source.includes('transfer')) iconName = 'swap-horizontal';
-  if (source.includes('youtube') || source.includes('netflix')) iconName = 'play';
+  // Use a generic icon instead of faking specific brand logos
+  const iconName = isCredit ? 'arrow-down-circle' : 'receipt';
 
   return (
     <TouchableOpacity
@@ -37,7 +33,7 @@ export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, o
       </View>
       <View style={styles.right}>
         <Text style={[styles.amount, isCredit ? styles.creditAmount : styles.debitAmount]}>
-          {isCredit ? '+' : '-'} $ {transaction.amount.toLocaleString()}
+          {isCredit ? '+' : '-'} NPR {transaction.amount.toLocaleString()}
         </Text>
       </View>
     </TouchableOpacity>

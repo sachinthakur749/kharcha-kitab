@@ -5,11 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from '../../components/LineChart';
 import { useTransactionStore } from '../../store/transactionStore';
 import { getCurrentMonthBS } from '../../utils/dateConverter';
+import { TransactionItem } from '../../components/TransactionItem';
 
 export default function StatsScreen() {
   const [filter, setFilter] = useState('Day');
   
-  // Real logic kept intact internally for future hook-up
   const { transactions, getByMonth } = useTransactionStore();
   const { year, month } = getCurrentMonthBS();
   const monthlyTransactions = useMemo(() => getByMonth(year, month), [year, month, transactions]);
@@ -30,6 +30,18 @@ export default function StatsScreen() {
       });
     return last7Days.some(v => v > 0) ? last7Days : [100, 200, 300, 400, 500, 600, 700];
   }, [monthlyTransactions]);
+
+  const chartLabels = useMemo(() => {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const todayIdx = new Date().getDay();
+    const result = [];
+    for(let i=6; i>=0; i--) {
+       let idx = todayIdx - i;
+       if (idx < 0) idx += 7;
+       result.push(days[idx]);
+    }
+    return result;
+  }, []);
 
   const recentTransactions = transactions.filter(t => t.type === 'debit').slice(0, 5);
 
@@ -78,8 +90,8 @@ export default function StatsScreen() {
             activeIndex={6} // Highlighting today
           />
           <View style={styles.chartLabels}>
-             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((lbl, i) => (
-                <Text key={lbl} style={[styles.chartLabelText, i === 6 && styles.activeChartLabelText]}>{lbl}</Text>
+             {chartLabels.map((lbl, i) => (
+                <Text key={lbl + i} style={[styles.chartLabelText, i === 6 && styles.activeChartLabelText]}>{lbl}</Text>
              ))}
           </View>
         </View>
@@ -95,17 +107,8 @@ export default function StatsScreen() {
           {recentTransactions.length === 0 ? (
              <Text style={{textAlign: 'center', color: '#666', marginTop: 20}}>No spending data available</Text>
           ) : (
-             recentTransactions.map((txn, idx) => (
-               <View key={txn.id} style={styles.transactionCard}>
-                 <View style={[styles.iconContainerStarbucks, { backgroundColor: idx % 2 === 0 ? '#00704A' : '#FF0000' }]}>
-                   <Ionicons name={idx % 2 === 0 ? "cafe" : "play"} size={20} color="#fff" />
-                 </View>
-                 <View style={styles.transactionInfo}>
-                   <Text style={styles.transactionName} numberOfLines={1}>{txn.source}</Text>
-                   <Text style={styles.transactionDate}>{new Date(txn.dateAD).toLocaleDateString()}</Text>
-                 </View>
-                 <Text style={styles.expenseAmountRed}>- $ {txn.amount.toLocaleString()}</Text>
-               </View>
+             recentTransactions.map((txn) => (
+                <TransactionItem key={txn.id} transaction={txn} />
              ))
           )}
         </View>
