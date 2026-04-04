@@ -41,6 +41,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a18efd3f-09ba-45f2-b285-883dd7d2f211"
+      }
+    },
+    "owner": "devthakur"
   }
 }
