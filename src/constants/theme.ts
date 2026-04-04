@@ -1,36 +1,77 @@
 /**
- * Design tokens extracted from UI mockups
- * Dark theme design system for Kharcha Kitab
+ * Design tokens for Kharcha Kitab
+ * Both light and dark mode palettes
  */
 
 import { Platform } from 'react-native';
 
-export const Colors = {
-  primary: '#438883', // Exact Teal found in all UI backgrounds
+export const darkColors = {
+  primary: '#438883',
+  primaryLight: '#599E99',
+  primaryDark: '#387B75',
+
+  secondary: '#8B5CF6',
+  secondaryLight: '#A78BFA',
+  secondaryDark: '#7C3AED',
+
+  success: '#22C55E',
+  successLight: 'rgba(34, 197, 94, 0.15)',
+
+  danger: '#F95B51',
+  dangerLight: 'rgba(249, 91, 81, 0.15)',
+
+  text: {
+    primary: '#F8FAFC',
+    secondary: '#CBD5E1',
+    tertiary: '#94A3B8',
+    inverse: '#0F172A',
+  },
+
+  background: {
+    primary: '#0F172A',
+    secondary: '#1E293B',
+    tertiary: '#334155',
+    elevated: '#1E293B',
+  },
+
+  border: {
+    primary: '#1E293B',
+    secondary: '#334155',
+  },
+
+  card: {
+    income: '#1E293B',
+    expense: '#1E293B',
+  },
+} as const;
+
+export const lightColors = {
+  primary: '#438883',
   primaryLight: '#599E99',
   primaryDark: '#387B75',
 
   secondary: '#F4F4F5',
-  secondaryDark: '#E5E7EB',
+  secondaryLight: '#E5E7EB',
+  secondaryDark: '#D1D5DB',
 
-  success: '#22C55E', // Green for income
+  success: '#22C55E',
   successLight: '#DCFCE7',
 
-  danger: '#F95B51', // Exact Red for expense
+  danger: '#F95B51',
   dangerLight: '#FEE2E2',
 
   text: {
-    primary: '#222222', // Dark slate for headers
-    secondary: '#666666', // Muted text for dates/labels
-    tertiary: '#999999', // Faint text for disabled/inactive
-    inverse: '#FFFFFF', // White text
+    primary: '#222222',
+    secondary: '#666666',
+    tertiary: '#999999',
+    inverse: '#FFFFFF',
   },
 
   background: {
-    primary: '#FFFFFF',   // Stark white screens/cards
-    secondary: '#F3F4F6', // Off-white/gray screen backgrounds
+    primary: '#FFFFFF',
+    secondary: '#F3F4F6',
     tertiary: '#EFEFEF',
-    elevated: '#FFFFFF',  // Floating cards
+    elevated: '#FFFFFF',
   },
 
   border: {
@@ -44,7 +85,11 @@ export const Colors = {
   },
 } as const;
 
-export type ThemeColor = keyof typeof Colors;
+/**
+ * Legacy export — defaults to dark for backward compat with stylesheets.
+ * Prefer calling getColors() at render time for proper theme switching.
+ */
+export const Colors = darkColors;
 
 export const Fonts = Platform.select({
   ios: {

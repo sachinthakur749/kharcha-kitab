@@ -1,22 +1,23 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LineChart } from '../../components/LineChart';
 import { useTransactionStore } from '../../store/transactionStore';
 import { getCurrentMonthBS } from '../../utils/dateConverter';
 import { TransactionItem } from '../../components/TransactionItem';
+import { useThemeColors } from '../../providers/ThemeProvider';
 
 export default function StatsScreen() {
+  const { colors } = useThemeColors();
   const [filter, setFilter] = useState('Day');
-  
+
   const { transactions, getByMonth } = useTransactionStore();
   const { year, month } = getCurrentMonthBS();
   const monthlyTransactions = useMemo(() => getByMonth(year, month), [year, month, transactions]);
 
-  // Calculate dynamic weekly/daily data
   const chartData = useMemo(() => {
-    if (monthlyTransactions.length === 0) return [100, 200, 300, 400, 500, 600, 700]; // Fallback
+    if (monthlyTransactions.length === 0) return [100, 200, 300, 400, 500, 600, 700];
     const last7Days = Array(7).fill(0);
     const today = new Date();
     monthlyTransactions
@@ -44,27 +45,26 @@ export default function StatsScreen() {
   }, []);
 
   const recentTransactions = transactions.filter(t => t.type === 'debit').slice(0, 5);
-
   const screenWidth = Dimensions.get('window').width;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerIcon}>
-          <Ionicons name="chevron-back" size={24} color="#1F2937" />
+          <Ionicons name="chevron-back" size={24} color={colors.text.secondary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Statistics</Text>
+        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>Analytics</Text>
         <TouchableOpacity style={styles.headerIcon}>
-          <Ionicons name="download-outline" size={24} color="#1F2937" />
+          <Ionicons name="download-outline" size={24} color={colors.text.secondary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.tabsContainer}>
           {['Day', 'Week', 'Month', 'Year'].map((tab) => (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={tab}
-              style={[styles.tab, filter === tab && styles.activeTab]}
+              style={[styles.tab, filter === tab && { backgroundColor: colors.primary }]}
               onPress={() => setFilter(tab)}
             >
               <Text style={[styles.tabText, filter === tab && styles.activeTabText]}>
@@ -75,9 +75,9 @@ export default function StatsScreen() {
         </View>
 
         <View style={styles.dropdownContainer}>
-          <TouchableOpacity style={styles.dropdown}>
-            <Text style={styles.dropdownText}>Expense</Text>
-            <Ionicons name="chevron-down" size={16} color="#666" />
+          <TouchableOpacity style={[styles.dropdown, { borderColor: colors.border.secondary }]}>
+            <Text style={[styles.dropdownText, { color: colors.text.secondary }]}>Expense</Text>
+            <Ionicons name="chevron-down" size={16} color={colors.text.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -86,26 +86,26 @@ export default function StatsScreen() {
             data={chartData}
             width={screenWidth}
             height={220}
-            color="#438883"
-            activeIndex={6} // Highlighting today
+            color={colors.primary}
+            activeIndex={6}
           />
           <View style={styles.chartLabels}>
              {chartLabels.map((lbl, i) => (
-                <Text key={lbl + i} style={[styles.chartLabelText, i === 6 && styles.activeChartLabelText]}>{lbl}</Text>
+                <Text key={lbl + i} style={[styles.chartLabelText, i === 6 && { color: colors.primary }]}>{lbl}</Text>
              ))}
           </View>
         </View>
 
         <View style={styles.topSpendingHeader}>
-          <Text style={styles.topSpendingTitle}>Top Spending</Text>
+          <Text style={[styles.topSpendingTitle, { color: colors.text.primary }]}>Top Spending</Text>
           <TouchableOpacity>
-             <Ionicons name="swap-vertical" size={20} color="#666" />
+             <Ionicons name="swap-vertical" size={20} color={colors.text.tertiary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.transactionsList}>
           {recentTransactions.length === 0 ? (
-             <Text style={{textAlign: 'center', color: '#666', marginTop: 20}}>No spending data available</Text>
+             <Text style={[styles.noDataText, { color: colors.text.tertiary }]}>No spending data available</Text>
           ) : (
              recentTransactions.map((txn) => (
                 <TransactionItem key={txn.id} transaction={txn} />
@@ -120,7 +120,6 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -130,12 +129,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   headerIcon: {
-    padding: 4,
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#222222',
   },
   content: {
     paddingBottom: 100,
@@ -151,9 +153,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-  },
-  activeTab: {
-    backgroundColor: '#438883',
   },
   tabText: {
     fontSize: 14,
@@ -173,7 +172,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#EFEFEF',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -181,7 +179,6 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 13,
-    color: '#666666',
     fontWeight: '500',
   },
   chartSection: {
@@ -198,10 +195,6 @@ const styles = StyleSheet.create({
     color: '#999999',
     fontWeight: '500',
   },
-  activeChartLabelText: {
-    color: '#438883',
-    fontWeight: '600',
-  },
   topSpendingHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -212,78 +205,13 @@ const styles = StyleSheet.create({
   topSpendingTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#222222',
   },
   transactionsList: {
     paddingHorizontal: 20,
     gap: 12,
   },
-  transactionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  transactionCardActive: {
-    backgroundColor: '#438883',
-  },
-  iconContainerStarbucks: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#00704A',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 14,
-  },
-  avatarIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    marginRight: 14,
-  },
-  iconContainerYoutube: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FF0000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 14,
-  },
-  transactionInfo: {
-    flex: 1,
-  },
-  transactionName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#222222',
-    marginBottom: 4,
-  },
-  transactionDate: {
-    fontSize: 13,
-    color: '#888888',
-  },
-  textWhite: {
-    color: '#FFFFFF',
-  },
-  textWhiteSoft: {
-    color: 'rgba(255,255,255,0.8)',
-  },
-  expenseAmountRed: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#F95B51',
-  },
-  expenseAmountWhite: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+  noDataText: {
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

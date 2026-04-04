@@ -4,8 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../../store/transactionStore';
 import { bankPatterns } from '../../config/banks.config';
+import { useThemeColors } from '../../providers/ThemeProvider';
+import { useThemeStore } from '../../store/themeStore';
 
 export default function SettingsScreen() {
+  const { colors } = useThemeColors();
+  const { themeMode, toggleTheme } = useThemeStore();
   const {
     enabledBanks,
     enabledWallets,
@@ -46,18 +50,17 @@ export default function SettingsScreen() {
     <View>
       <TouchableOpacity style={styles.listItem} onPress={onPress}>
         <View style={[styles.listIconContainer, { backgroundColor: bg }]}>
-           <Ionicons name={icon as any} size={20} color="#387B75" />
+           <Ionicons name={icon as any} size={20} color={colors.primary} />
         </View>
-        <Text style={styles.listLabel}>{label}</Text>
+        <Text style={[styles.listLabel, { color: colors.text.primary }]}>{label}</Text>
       </TouchableOpacity>
-      {!isLast && <View style={styles.divider} />}
+      {!isLast && <View style={[styles.divider, { backgroundColor: colors.border.secondary }]} />}
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      {/* Top Background Curve extending down */}
-      <View style={styles.topBackground} />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <View style={[styles.topBackground, { backgroundColor: colors.primary }]} />
 
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         {/* Header */}
@@ -65,8 +68,8 @@ export default function SettingsScreen() {
           <TouchableOpacity style={styles.headerIcon}>
             <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Profile</Text>
-          <TouchableOpacity style={styles.bellIconContainer}>
+          <Text style={[styles.headerTitle, { color: '#FFFFFF' }]}>Settings</Text>
+          <TouchableOpacity style={[styles.bellIconContainer, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
             <Ionicons name="notifications-outline" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -74,18 +77,35 @@ export default function SettingsScreen() {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           {/* Avatar Section */}
           <View style={styles.profileSection}>
-            <View style={styles.avatarBorder}>
-              <Ionicons name="person" size={80} color="#C4C4C4" style={{marginTop: 10}} />
+            <View style={[styles.avatarBorder, { backgroundColor: colors.background.secondary, borderColor: colors.border.secondary }]}>
+              <Ionicons name="person" size={80} color={colors.text.tertiary} style={{marginTop: 10}} />
             </View>
-            <Text style={styles.userName}>Kharcha Kitab User</Text>
-            <Text style={styles.userHandle}>@user</Text>
+            <Text style={[styles.userName, { color: colors.text.primary }]}>Kharcha Kitab User</Text>
+            <Text style={[styles.userHandle, { color: colors.primary }]}>@user</Text>
+          </View>
+
+          {/* Appearance */}
+          <View style={styles.menuContainer}>
+            <View style={styles.appearanceRow}>
+              <View style={[styles.listIconContainer, { backgroundColor: colors.background.secondary }]}>
+                <Ionicons name="moon" size={20} color={colors.primary} />
+              </View>
+              <Text style={[styles.listLabel, { color: colors.text.primary, flex: 1 }]}>Dark Mode</Text>
+              <Switch
+                value={themeMode === 'dark'}
+                onValueChange={toggleTheme}
+                trackColor={{ false: colors.border.secondary, true: colors.primaryLight }}
+                thumbColor={themeMode === 'dark' ? colors.primary : colors.text.tertiary}
+              />
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.border.secondary, marginLeft: 20 }]} />
           </View>
 
           {/* Menu Items */}
           <View style={styles.menuContainer}>
-             {renderListItem('business', '#F3F4F6', 'Bank Integrations', () => setShowBanksModal(true))}
-             {renderListItem('wallet', '#F3F4F6', 'Digital Wallets', () => setShowWalletsModal(true))}
-             {renderListItem('lock-closed', '#F3F4F6', 'Data and privacy (Reset)', handleClearData, true)}
+             {renderListItem('business', colors.background.secondary, 'Bank Integrations', () => setShowBanksModal(true))}
+             {renderListItem('wallet', colors.background.secondary, 'Digital Wallets', () => setShowWalletsModal(true))}
+             {renderListItem('lock-closed', colors.background.secondary, 'Data and privacy (Reset)', handleClearData, true)}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -93,18 +113,23 @@ export default function SettingsScreen() {
       {/* Banks Modal */}
       <Modal visible={showBanksModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background.elevated }]}>
             <View style={styles.modalHeader}>
-               <Text style={styles.modalTitle}>Bank Integrations</Text>
+               <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Bank Integrations</Text>
                <TouchableOpacity onPress={() => setShowBanksModal(false)}>
-                 <Ionicons name="close" size={24} color="#666" />
+                 <Ionicons name="close" size={24} color={colors.text.secondary} />
                </TouchableOpacity>
             </View>
             <ScrollView style={{maxHeight: 400}}>
               {bankPatterns.map((bank) => (
-                <View key={bank.senderId} style={styles.toggleRow}>
-                  <Text style={styles.toggleLabel}>{bank.name}</Text>
-                  <Switch value={enabledBanks.includes(bank.senderId)} onValueChange={() => toggleBank(bank.senderId)} trackColor={{ false: '#F3F4F6', true: '#599E99' }} thumbColor={enabledBanks.includes(bank.senderId) ? '#387B75' : '#888'} />
+                <View key={bank.senderId} style={[styles.toggleRow, { borderBottomColor: colors.border.secondary }]}>
+                  <Text style={[styles.toggleLabel, { color: colors.text.primary }]}>{bank.name}</Text>
+                  <Switch
+                    value={enabledBanks.includes(bank.senderId)}
+                    onValueChange={() => toggleBank(bank.senderId)}
+                    trackColor={{ false: colors.background.secondary, true: colors.primaryLight }}
+                    thumbColor={enabledBanks.includes(bank.senderId) ? colors.primary : '#888'}
+                  />
                 </View>
               ))}
             </ScrollView>
@@ -115,25 +140,29 @@ export default function SettingsScreen() {
       {/* Wallets Modal */}
       <Modal visible={showWalletsModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background.elevated }]}>
             <View style={styles.modalHeader}>
-               <Text style={styles.modalTitle}>Digital Wallets</Text>
+               <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Digital Wallets</Text>
                <TouchableOpacity onPress={() => setShowWalletsModal(false)}>
-                 <Ionicons name="close" size={24} color="#666" />
+                 <Ionicons name="close" size={24} color={colors.text.secondary} />
                </TouchableOpacity>
             </View>
             <ScrollView style={{maxHeight: 400}}>
               {Object.entries(walletNames).map(([id, name]) => (
-                <View key={id} style={styles.toggleRow}>
-                  <Text style={styles.toggleLabel}>{name}</Text>
-                  <Switch value={enabledWallets.includes(id)} onValueChange={() => toggleWallet(id)} trackColor={{ false: '#F3F4F6', true: '#599E99' }} thumbColor={enabledWallets.includes(id) ? '#387B75' : '#888'} />
+                <View key={id} style={[styles.toggleRow, { borderBottomColor: colors.border.secondary }]}>
+                  <Text style={[styles.toggleLabel, { color: colors.text.primary }]}>{name}</Text>
+                  <Switch
+                    value={enabledWallets.includes(id)}
+                    onValueChange={() => toggleWallet(id)}
+                    trackColor={{ false: colors.background.secondary, true: colors.primaryLight }}
+                    thumbColor={enabledWallets.includes(id) ? colors.primary : '#888'}
+                  />
                 </View>
               ))}
             </ScrollView>
           </View>
         </View>
       </Modal>
-
     </View>
   );
 }
@@ -141,7 +170,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   topBackground: {
     position: 'absolute',
@@ -149,7 +177,6 @@ const styles = StyleSheet.create({
     left: -50,
     right: -50,
     height: 330,
-    backgroundColor: '#387B75',
     borderBottomLeftRadius: 300,
     borderBottomRightRadius: 300,
   },
@@ -165,18 +192,21 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerIcon: {
-    padding: 4,
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   bellIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -191,37 +221,29 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
     marginBottom: 20,
-  },
-  avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+    borderWidth: 2,
   },
   userName: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#222222',
     marginBottom: 4,
   },
   userHandle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#387B75',
   },
   menuContainer: {
     paddingHorizontal: 20,
     marginTop: 10,
   },
-  listItem: {
+  appearanceRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
@@ -237,20 +259,21 @@ const styles = StyleSheet.create({
   listLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#222222',
   },
   divider: {
     height: 1,
-    backgroundColor: '#EFEFEF',
-    marginLeft: 60,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -265,55 +288,6 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#222222',
-  },
-  typeSelector: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 20,
-  },
-  typeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: '#F4F4F5',
-    alignItems: 'center',
-  },
-  typeButtonActive: {
-    backgroundColor: '#F95B51',
-  },
-  typeButtonActiveCredit: {
-    backgroundColor: '#22C55E',
-  },
-  typeButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666666',
-  },
-  typeButtonTextActive: {
-    color: '#FFFFFF',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    color: '#222222',
-    marginBottom: 16,
-    backgroundColor: '#FAFAFA',
-  },
-  submitBtn: {
-    backgroundColor: '#387B75',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  submitText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
   },
   toggleRow: {
     flexDirection: 'row',
@@ -321,10 +295,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EFEFEF',
   },
   toggleLabel: {
     fontSize: 16,
-    color: '#444444',
   },
 });

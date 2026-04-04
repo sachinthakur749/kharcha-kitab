@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../../store/transactionStore';
 import { TransactionItem } from '../../components/TransactionItem';
 import { getCurrentMonthBS } from '../../utils/dateConverter';
-import { Colors } from '../../constants/theme';
+import { useThemeColors } from '../../providers/ThemeProvider';
 
 export default function DashboardScreen() {
+  const { colors } = useThemeColors();
   const { transactions, getByMonth, getBalance } = useTransactionStore();
   const { year, month } = getCurrentMonthBS();
   const monthlyTransactions = useMemo(() => getByMonth(year, month), [year, month, transactions]);
@@ -23,35 +24,27 @@ export default function DashboardScreen() {
 
   const recentTransactions = transactions.slice(0, 5);
 
-  const avatars = [
-    'https://i.pravatar.cc/100?img=5',
-    'https://i.pravatar.cc/100?img=11',
-    'https://i.pravatar.cc/100?img=3',
-    'https://i.pravatar.cc/100?img=12',
-    'https://i.pravatar.cc/100?img=9',
-  ];
-
   return (
-    <View style={styles.container}>
-      {/* Background Teal Curved Wrapper */}
-      <View style={styles.topBackground} />
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      {/* Background Curved Wrapper */}
+      <View style={[styles.topBackground, { backgroundColor: colors.background.secondary }]} />
 
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          
+
           {/* Header */}
           <View style={styles.headerRow}>
             <View>
-              <Text style={styles.greetingText}>Welcome back,</Text>
-              <Text style={styles.userNameText}>Kharcha Kitab</Text>
+              <Text style={[styles.greetingText, { color: colors.text.secondary }]}>Welcome back,</Text>
+              <Text style={[styles.userNameText, { color: colors.text.primary }]}>Kharcha Kitab</Text>
             </View>
-            <TouchableOpacity style={styles.bellIconContainer}>
-              <Ionicons name="notifications-outline" size={20} color="#FFFFFF" />
+            <TouchableOpacity style={[styles.bellIconContainer, { backgroundColor: colors.background.secondary }]}>
+              <Ionicons name="notifications-outline" size={20} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 
           {/* Balance Card */}
-          <View style={styles.balanceCard}>
+          <View style={[styles.balanceCard, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
             <View style={styles.balanceHeader}>
               <View style={styles.balanceTitleRow}>
                 <Text style={styles.balanceLabel}>Total Balance</Text>
@@ -65,7 +58,7 @@ export default function DashboardScreen() {
               <View style={styles.summaryBox}>
                 <View style={styles.summaryIconText}>
                   <View style={styles.arrowCircle}>
-                    <Ionicons name="arrow-down" size={12} color="#438883" />
+                    <Ionicons name="arrow-down" size={12} color="#22C55E" />
                   </View>
                   <Text style={styles.summarySubLabel}>Income</Text>
                 </View>
@@ -75,7 +68,7 @@ export default function DashboardScreen() {
               <View style={styles.summaryBox}>
                 <View style={styles.summaryIconText}>
                   <View style={styles.arrowCircle}>
-                    <Ionicons name="arrow-up" size={12} color="#438883" />
+                    <Ionicons name="arrow-up" size={12} color="#F95B51" />
                   </View>
                   <Text style={styles.summarySubLabel}>Expenses</Text>
                 </View>
@@ -86,16 +79,16 @@ export default function DashboardScreen() {
 
           {/* Transactions History */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Transactions History</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>Transactions History</Text>
             <TouchableOpacity>
-              <Text style={styles.seeAllText}>See all</Text>
+              <Text style={[styles.seeAllText, { color: colors.primary }]}>See all</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.transactionsList}>
             {recentTransactions.length === 0 ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No recent transactions</Text>
+              <View style={[styles.emptyContainer, { backgroundColor: colors.background.secondary }]}>
+                <Text style={[styles.emptyText, { color: colors.text.tertiary }]}>No recent transactions</Text>
               </View>
             ) : (
               recentTransactions.map((txn) => (
@@ -113,7 +106,6 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   topBackground: {
     position: 'absolute',
@@ -121,7 +113,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 280,
-    backgroundColor: '#438883',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
@@ -141,30 +132,25 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
     marginBottom: 4,
   },
   userNameText: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
   },
   bellIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   balanceCard: {
-    backgroundColor: '#2E6662',
     marginHorizontal: 20,
     borderRadius: 20,
     padding: 24,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 15,
     elevation: 8,
     marginBottom: 30,
@@ -203,10 +189,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   arrowCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 6,
@@ -230,11 +216,9 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#222222',
   },
   seeAllText: {
     fontSize: 14,
-    color: '#666666',
     fontWeight: '500',
   },
   transactionsList: {
@@ -244,20 +228,9 @@ const styles = StyleSheet.create({
   emptyContainer: {
     padding: 24,
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
     borderRadius: 16,
   },
   emptyText: {
-    color: '#666666',
-  },
-  avatarsScroll: {
-    paddingLeft: 20,
-    paddingRight: 10, // Avoid trailing cutoff
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 12,
+    fontSize: 14,
   },
 });

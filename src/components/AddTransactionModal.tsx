@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../store/transactionStore';
+import { useThemeColors } from '../providers/ThemeProvider';
 
 interface Props {
   visible: boolean;
@@ -9,8 +10,9 @@ interface Props {
 }
 
 export const AddTransactionModal: React.FC<Props> = ({ visible, onClose }) => {
+  const { colors } = useThemeColors();
   const { addTransaction } = useTransactionStore();
-  
+
   const [manualAmount, setManualAmount] = useState('');
   const [manualType, setManualType] = useState<'credit' | 'debit'>('debit');
   const [manualNote, setManualNote] = useState('');
@@ -42,46 +44,46 @@ export const AddTransactionModal: React.FC<Props> = ({ visible, onClose }) => {
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+        <View style={[styles.modalContent, { backgroundColor: colors.background.elevated }]}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Add Transaction</Text>
+            <Text style={[styles.modalTitle, { color: colors.text.primary }]}>Add Transaction</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-              <Ionicons name="close" size={24} color="#666" />
+              <Ionicons name="close" size={24} color={colors.text.secondary} />
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.typeSelector}>
-            <TouchableOpacity 
-              style={[styles.typeButton, manualType === 'debit' && styles.typeButtonActiveExpense]} 
+            <TouchableOpacity
+              style={[styles.typeButton, { backgroundColor: colors.background.secondary }, manualType === 'debit' && styles.typeButtonActiveExpense]}
               onPress={() => setManualType('debit')}
             >
               <Text style={[styles.typeButtonText, manualType === 'debit' && styles.textWhite]}>Expense</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.typeButton, manualType === 'credit' && styles.typeButtonActiveIncome]} 
+            <TouchableOpacity
+              style={[styles.typeButton, { backgroundColor: colors.background.secondary }, manualType === 'credit' && styles.typeButtonActiveIncome]}
               onPress={() => setManualType('credit')}
             >
               <Text style={[styles.typeButtonText, manualType === 'credit' && styles.textWhite]}>Income</Text>
             </TouchableOpacity>
           </View>
 
-          <TextInput 
-            style={styles.input} 
-            placeholder="Amount (NPR)" 
-            keyboardType="numeric" 
-            value={manualAmount} 
-            onChangeText={setManualAmount} 
-            placeholderTextColor="#999"
+          <TextInput
+            style={[styles.input, { borderColor: colors.border.secondary, backgroundColor: colors.background.secondary, color: colors.text.primary }]}
+            placeholder="Amount (NPR)"
+            keyboardType="numeric"
+            value={manualAmount}
+            onChangeText={setManualAmount}
+            placeholderTextColor={colors.text.tertiary}
           />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Note (optional)" 
-            value={manualNote} 
-            onChangeText={setManualNote} 
-            placeholderTextColor="#999"
+          <TextInput
+            style={[styles.input, { borderColor: colors.border.secondary, backgroundColor: colors.background.secondary, color: colors.text.primary }]}
+            placeholder="Note (optional)"
+            value={manualNote}
+            onChangeText={setManualNote}
+            placeholderTextColor={colors.text.tertiary}
           />
 
-          <TouchableOpacity style={styles.submitBtn} onPress={handleAddManualTransaction}>
+          <TouchableOpacity style={[styles.submitBtn, { backgroundColor: colors.primary }]} onPress={handleAddManualTransaction}>
             <Text style={styles.submitText}>Save Transaction</Text>
           </TouchableOpacity>
         </View>
@@ -93,18 +95,17 @@ export const AddTransactionModal: React.FC<Props> = ({ visible, onClose }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
     paddingBottom: 40,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 10,
     elevation: 8,
   },
@@ -117,21 +118,23 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#222222',
   },
   closeBtn: {
-    padding: 4,
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   typeSelector: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
     marginBottom: 20,
   },
   typeButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: '#F4F4F5',
     alignItems: 'center',
   },
   typeButtonActiveExpense: {
@@ -150,24 +153,18 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#EFEFEF',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
-    color: '#222222',
     marginBottom: 16,
-    backgroundColor: '#FAFAFA',
   },
   submitBtn: {
-    backgroundColor: '#387B75',
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 10,
-    shadowColor: '#387B75',
+    shadowOpacity: 0.3,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
     elevation: 4,
   },
   submitText: {

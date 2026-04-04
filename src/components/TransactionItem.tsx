@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Transaction } from '../types/transaction';
 import { formatBSDate } from '../utils/dateConverter';
-import { Colors, BorderRadius, FontSize, FontWeight, Spacing } from '../constants/theme';
+import { useThemeColors } from '../providers/ThemeProvider';
 import { Ionicons } from '@expo/vector-icons';
 
 interface TransactionItemProps {
@@ -11,24 +11,24 @@ interface TransactionItemProps {
 }
 
 export const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onPress }) => {
+  const { colors } = useThemeColors();
   const isCredit = transaction.type === 'credit';
-  
-  // Use a generic icon instead of faking specific brand logos
+
   const iconName = isCredit ? 'arrow-down-circle' : 'receipt';
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background.elevated }]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <View style={styles.left}>
         <View style={[styles.icon, isCredit ? styles.creditIcon : styles.debitIcon]}>
-           <Ionicons name={iconName as any} size={20} color="#FFFFFF" />
+           <Ionicons name={iconName} size={20} color="#FFFFFF" />
         </View>
         <View style={styles.details}>
-          <Text style={styles.source} numberOfLines={1}>{transaction.source}</Text>
-          <Text style={styles.date}>{formatBSDate(transaction.dateBS)}</Text>
+          <Text style={[styles.source, { color: colors.text.primary }]} numberOfLines={1}>{transaction.source}</Text>
+          <Text style={[styles.date, { color: colors.text.tertiary }]}>{formatBSDate(transaction.dateBS)}</Text>
         </View>
       </View>
       <View style={styles.right}>
@@ -45,14 +45,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 16,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 2,
   },
@@ -81,12 +80,10 @@ const styles = StyleSheet.create({
   source: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#222222',
     marginBottom: 4,
   },
   date: {
     fontSize: 13,
-    color: '#888888',
   },
   right: {
     alignItems: 'flex-end',

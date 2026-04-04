@@ -4,13 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useTransactionStore } from '../../store/transactionStore';
 import { TransactionItem } from '../../components/TransactionItem';
-import { Colors } from '../../constants/theme';
 import { AddTransactionModal } from '../../components/AddTransactionModal';
+import { useThemeColors } from '../../providers/ThemeProvider';
 
 type FilterType = 'all' | 'credit' | 'debit';
 type FilterPeriod = 'all' | 'today' | 'week' | 'month';
 
 export default function HistoryScreen() {
+  const { colors } = useThemeColors();
   const { transactions, getBalance } = useTransactionStore();
   const [typeFilter, setTypeFilter] = useState<FilterType>('all');
   const [periodFilter, setPeriodFilter] = useState<FilterPeriod>('all');
@@ -43,7 +44,7 @@ export default function HistoryScreen() {
 
   const renderFilterButton = (filter: FilterType | FilterPeriod, value: FilterType | FilterPeriod, label: string, onPress: () => void) => (
     <TouchableOpacity
-      style={[styles.filterButton, filter === value && styles.filterButtonActive]}
+      style={[styles.filterButton, filter === value && { backgroundColor: colors.primary }]}
       onPress={onPress}
     >
       <Text style={[styles.filterButtonText, filter === value && styles.filterButtonTextActive]}>
@@ -54,25 +55,27 @@ export default function HistoryScreen() {
 
   const renderHeader = () => (
     <View style={styles.cardHeader}>
-      <Text style={styles.cardLabel}>Total Balance</Text>
-      <Text style={styles.cardAmount}>NPR {getBalance().toLocaleString()}</Text>
+      <Text style={[styles.cardLabel, { color: colors.text.tertiary }]}>Total Balance</Text>
+      <Text style={[styles.cardAmount, { color: colors.text.primary }]}>NPR {getBalance().toLocaleString()}</Text>
 
       <View style={styles.actionRow}>
         <View style={styles.actionItem}>
-          <TouchableOpacity style={styles.actionIcon} onPress={() => setShowAddModal(true)}>
-            <Ionicons name="add" size={24} color="#666" />
+          <TouchableOpacity
+            style={[styles.actionIcon, { backgroundColor: colors.background.primary, borderColor: colors.border.secondary }]}
+            onPress={() => setShowAddModal(true)}
+          >
+            <Ionicons name="add" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
-          <Text style={styles.actionLabel}>Add</Text>
+          <Text style={[styles.actionLabel, { color: colors.text.primary }]}>Add</Text>
         </View>
       </View>
 
-      {/* Embedded Filters representing the tabs from the mockup */}
       <View style={styles.filtersWrapper}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filtersScroll}>
           {renderFilterButton('all', typeFilter, 'All', () => setTypeFilter('all'))}
           {renderFilterButton('credit', typeFilter, 'Income', () => setTypeFilter('credit'))}
           {renderFilterButton('debit', typeFilter, 'Expense', () => setTypeFilter('debit'))}
-          <View style={{width: 10}} />
+          <View style={{width: 8}} />
           {renderFilterButton('today', periodFilter, 'Today', () => setPeriodFilter('today'))}
           {renderFilterButton('week', periodFilter, 'Week', () => setPeriodFilter('week'))}
           {renderFilterButton('month', periodFilter, 'Month', () => setPeriodFilter('month'))}
@@ -83,29 +86,26 @@ export default function HistoryScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Top Teal Background Curve */}
-      <View style={styles.topBackground} />
+    <View style={[styles.container, { backgroundColor: colors.background.secondary }]}>
+      <View style={[styles.topBackground, { backgroundColor: colors.background.secondary }]} />
 
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.headerIcon}>
-            <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+            <Ionicons name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Wallet</Text>
+          <Text style={[styles.headerTitle, { color: colors.text.primary }]}>History</Text>
           <TouchableOpacity style={styles.bellIconContainer}>
-            <Ionicons name="notifications-outline" size={20} color="#FFFFFF" />
+            <Ionicons name="notifications-outline" size={20} color="#F8FAFC" />
           </TouchableOpacity>
         </View>
 
-        {/* Massive White Card wrapping the list */}
-        <View style={styles.mainCard}>
+        <View style={[styles.mainCard, { backgroundColor: colors.background.elevated }]}>
           {filteredTransactions.length === 0 ? (
             <ScrollView contentContainerStyle={{flexGrow: 1}}>
               {renderHeader()}
               <View style={styles.emptyContainer}>
-                <Text style={styles.emptyText}>No transactions found</Text>
+                <Text style={[styles.emptyText, { color: colors.text.tertiary }]}>No transactions found</Text>
               </View>
             </ScrollView>
           ) : (
@@ -120,6 +120,8 @@ export default function HistoryScreen() {
           )}
         </View>
       </SafeAreaView>
+
+      <AddTransactionModal visible={showAddModal} onClose={() => setShowAddModal(false)} />
     </View>
   );
 }
@@ -127,7 +129,6 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#387B75', // Matching the teal BG directly
   },
   topBackground: {
     position: 'absolute',
@@ -135,7 +136,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 300,
-    backgroundColor: '#387B75',
   },
   safeArea: {
     flex: 1,
@@ -146,27 +146,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 40, // Space before the card
+    paddingBottom: 40,
   },
   headerIcon: {
-    padding: 4,
+    padding: 8,
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   bellIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   mainCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 36,
     borderTopRightRadius: 36,
     paddingTop: 30,
@@ -177,14 +179,12 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 14,
-    color: '#666666',
     marginBottom: 8,
     fontWeight: '500',
   },
   cardAmount: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#222222',
     marginBottom: 30,
   },
   actionRow: {
@@ -201,14 +201,12 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 1,
-    borderColor: '#EFEFEF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
   },
   actionLabel: {
     fontSize: 14,
-    color: '#222222',
   },
   filtersWrapper: {
     width: '100%',
@@ -223,17 +221,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 20,
     backgroundColor: '#F4F4F5',
-    marginRight: 10,
-  },
-  filterButtonActive: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
+    marginRight: 8,
   },
   filterButtonText: {
     fontSize: 14,
@@ -241,7 +229,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   filterButtonTextActive: {
-    color: '#222222',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   listContent: {
@@ -254,6 +242,5 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999999',
   },
 });
